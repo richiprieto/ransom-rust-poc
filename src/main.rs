@@ -83,6 +83,7 @@ fn cifrar_archivos(path: &Path, rsa_encrypt: &Rsa<openssl::pkey::Public>) -> () 
                 .public_encrypt(&content, &mut buf, Padding::PKCS1)
                 .unwrap();
             // cifrando el archivo
+            println!("{:?}", Padding::PKCS1);
             file.write_all(&buf).unwrap();
             // reemplazando los bytes originales por los cifrados
         }
@@ -97,9 +98,9 @@ fn descifrar_archivos(path: &Path, rsa_decrypt: &Rsa<openssl::pkey::Private>) ->
             rsa_decrypt
                 .private_decrypt(&content, &mut buf, Padding::PKCS1)
                 .unwrap();
+            // Verificar desde aqui
             let elimina_padding = String::from_utf8(buf).unwrap();
             println!("{}", elimina_padding);
-            let elimina_padding = elimina_padding.trim_matches(char::from(0));
             file.write_all(elimina_padding.as_bytes()).unwrap();
         }
     }
