@@ -18,7 +18,7 @@ fn main() {
         .get_matches();
 
     if let ("iterar", Some(_)) = matches.subcommand() {
-        for entry in WalkDir::new("./").into_iter().filter_map(|e| e.ok()) {
+        for entry in WalkDir::new("./prueba").into_iter().filter_map(|e| e.ok()) {
             println!("{}", entry.path().display());
         }
     }
@@ -29,9 +29,9 @@ fn main() {
         let key = genera_clave_cifrado();
         // Llamada a generar clave, devuleve la clave de 32bytes
         let cifrar_aes = AesSafe256Encryptor::new(&key);
-        // Creamos el cifrador con la clave
+        // Creamos el cifrado con la clave
 
-        for entry in WalkDir::new("./").into_iter().filter_map(|e| e.ok()) {
+        for entry in WalkDir::new("./prueba").into_iter().filter_map(|e| e.ok()) {
             // Leemos los archivos que están en el directorio
             let archivo = entry.path();
             // Extraemos el path de cada archivo
@@ -44,15 +44,15 @@ fn main() {
     if let ("descifrar", Some(_)) = matches.subcommand() {
         // verificar el subcomando descifrar
         println!("Descifrando archivos...");
-        let mut archivo_clave = File::open("../clave.key").expect("No se puede leer el archivo");
+        let mut archivo_clave = File::open("clave.key").expect("No se puede leer el archivo");
         // Abrir el archivo clave.key
         let mut key: Vec<u8> = Vec::<u8>::new();
         archivo_clave.read_to_end(&mut key).unwrap();
         // Llamada a generar clave, devuleve la clave de 32bytes
         let descifrar_aes = AesSafe256Decryptor::new(&key);
-        // Creamos el cifrador con la clave
+        // Creamos el descifrado con la clave
 
-        for entry in WalkDir::new("./").into_iter().filter_map(|e| e.ok()) {
+        for entry in WalkDir::new("./prueba").into_iter().filter_map(|e| e.ok()) {
             // Leemos los archivos que están en el directorio
             let archivo = entry.path();
             // Extraemos el path de cada archivo
@@ -65,7 +65,7 @@ fn main() {
 
 fn genera_clave_cifrado() -> [u8; 32] {
     let mut clave_file =
-        File::create("../clave.key").expect("No se pudo crear el archivo, revise permisos");
+        File::create("clave.key").expect("No se pudo crear el archivo, revise permisos");
     // Creamos un archivo para almacenar la clave de cifrado
     // que se encontrará en el directorio superior
     // al que ejecutamos el programa
