@@ -67,8 +67,6 @@ fn genera_clave_cifrado() -> [u8; 32] {
     let mut clave_file =
         File::create("clave.key").expect("No se pudo crear el archivo, revise permisos");
     // Creamos un archivo para almacenar la clave de cifrado
-    // que se encontrará en el directorio superior
-    // al que ejecutamos el programa
     let clave: [u8; 32] = thread_rng().gen();
     // Generamos un vector de tamaño 32 bytes
     // tipo u8
